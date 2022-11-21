@@ -1,0 +1,5 @@
+python test_lanenet.py --weights_path weights/tusimple_lanenet.ckpt --image_path ../test_set/clips/0530/1492626047222176976_0/1.jpg
+
+python test_lanenet.py --weights_path weights/tusimple_lanenet.ckpt --image_path data --save_path results
+
+python evaluate_lanenet_on_tusimple.py --image_dir ../test_set/clips --weights_path weights/tusimple_lanenet.ckpt --save_dir ../test_set/test_output

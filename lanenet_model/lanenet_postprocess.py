@@ -393,6 +393,7 @@ class LaneNetPostProcessor(object):
 
         # tusimple test data sample point along y axis every 10 pixels
         source_image_width = source_image.shape[1]
+        ptsList = []
         for index, single_lane_pts in enumerate(src_lane_pts):
             single_lane_pt_x = np.array(single_lane_pts, dtype=np.float32)[:, 0]
             single_lane_pt_y = np.array(single_lane_pts, dtype=np.float32)[:, 1]
@@ -402,6 +403,9 @@ class LaneNetPostProcessor(object):
             else:
                 raise ValueError('Wrong data source now only support tusimple')
             step = int(math.floor((end_plot_y - start_plot_y) / 10))
+            
+            ptsList2 = []
+            
             for plot_y in np.linspace(start_plot_y, end_plot_y, step):
                 diff = single_lane_pt_y - plot_y
                 fake_diff_bigger_than_zero = diff.copy()
@@ -434,10 +438,13 @@ class LaneNetPostProcessor(object):
                 lane_color = self._color_map[index].tolist()
                 cv2.circle(source_image, (int(interpolation_src_pt_x),
                                           int(interpolation_src_pt_y)), 5, lane_color, -1)
+                ptsList2.append([int(interpolation_src_pt_x), int(interpolation_src_pt_y)])
+            ptsList.append(np.array(ptsList2))
         ret = {
             'mask_image': mask_image,
             'fit_params': fit_params,
             'source_image': source_image,
+            'ptsList': np.array(ptsList)
         }
 
         return ret
