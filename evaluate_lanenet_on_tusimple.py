@@ -15,9 +15,11 @@ import os.path as ops
 import time
 import json
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import cv2
 import numpy as np
 import tensorflow as tf
+tf.get_logger().setLevel('ERROR')
 import tqdm
 import matplotlib.pyplot as plt
 import random as rand
@@ -57,6 +59,9 @@ def minmax_scale(input_arr):
     output_arr = (input_arr - min_val) * 255.0 / (max_val - min_val)
 
     return output_arr
+
+def sort_func(x):
+    return x[1]
 
 def eval_lanenet(src_dir, weights_path, save_dir, save_json):
     """
@@ -138,9 +143,11 @@ def eval_lanenet(src_dir, weights_path, save_dir, save_json):
             # #save images
             ptsList = postprocess_result['ptsList']
             image_name = "/".join(image_path.split('/')[2:])
+            ptsList = list(map(lambda x: sorted(x, key=lambda x: x[1]), ptsList))
+
             dict[image_name] = ptsList
- 
-            ####### shwoing images heree ########
+
+            ###### shwoing images heree ########
             # plt.figure('mask_image')
             # plt.imshow(mask_image[:, :, (2, 1, 0)])
             # plt.figure('src_image')
@@ -167,11 +174,11 @@ def eval_lanenet(src_dir, weights_path, save_dir, save_json):
             cv2.imwrite(output_image_path.replace(".jpg", "") + 'binary_seg_image.jpg', binary_seg_image[0] * 255)
             cv2.imwrite(output_image_path.replace(".jpg", "") +  'instance_seg_image.jpg', embedding_image)
             cv2.imwrite(output_image_path.replace(".jpg", "") + 'mask_image.jpg', mask_image)
-            # print("Images written")
+            print("Images written")
         
         with open(save_json, "w") as outfile:
             json.dump(dict, outfile)
-        # print("Json written")
+        print("Json written")
 
     return
 
