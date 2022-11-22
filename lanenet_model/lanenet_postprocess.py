@@ -439,12 +439,12 @@ class LaneNetPostProcessor(object):
                 cv2.circle(source_image, (int(interpolation_src_pt_x),
                                           int(interpolation_src_pt_y)), 5, lane_color, -1)
                 ptsList2.append([int(interpolation_src_pt_x), int(interpolation_src_pt_y)])
-            ptsList.append(np.array(ptsList2))
+            ptsList.append(ptsList2)
         ret = {
             'mask_image': mask_image,
             'fit_params': fit_params,
             'source_image': source_image,
-            'ptsList': np.array(ptsList)
+            'ptsList': ptsList
         }
 
         return ret
