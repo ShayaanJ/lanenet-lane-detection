@@ -26,10 +26,10 @@ def dst_pts(src):
     frac = 0.25
     # horizontal difference between src2 and src1
     length = src[1][0] - src[0][0]
-    dst1 = [src[0][0] + length*frac, src[0][1]]
-    dst2 = [src[1][0] - length*frac, src[0][1]]
-    dst3 = [src[0][0] + length*frac, src[2][1]]
-    dst4 = [src[1][0] - length*frac, src[2][1]]
+    dst1 = [int(src[0][0] + length*frac), src[0][1]]
+    dst2 = [int(src[1][0] - length*frac), src[0][1]]
+    dst3 = [int(src[0][0] + length*frac), src[2][1]]
+    dst4 = [int(src[1][0] - length*frac), src[2][1]]
     return [dst1, dst2, dst3, dst4]
 
 
@@ -38,11 +38,11 @@ def src_pts(pts1, pts2):
     src3 = pts1[int(len(pts1)*0.75)]
     x_30 = pts2[int(len(pts2)*0.3)]
     x_80 = pts2[int(len(pts2)*0.8)]
-    eq = line_eq([x_30, x_80])
+    eq = line_eq(np.array([x_30, x_80]))
     # ax + by + c = 0
     # x = -(by + c)/a
-    src2 = [-(eq[1]*src1[1] + eq[2])/eq[0], src1[1]]
-    src4 = [-(eq[1]*src3[1] + eq[2])/eq[0], src3[1]]
+    src2 = [int(-(eq[1]*src1[1] + eq[2])/eq[0]), src1[1]]
+    src4 = [int(-(eq[1]*src3[1] + eq[2])/eq[0]), src3[1]]
     return [src1, src2, src3, src4]
 
 
@@ -67,6 +67,9 @@ img = plt.imread("../test_set/" + key1)
 # img = cv2.circle(img, (lines[0], lines[1]), 5, (0, 255, 0), -1)
 src = src_pts(lane1, lane2)
 dst = dst_pts(src)
+print(src)
+print("----------------")
+print(dst)
 img = cv2.circle(img, src[0], 5, (0, 255, 0), -1)
 img = cv2.circle(img, src[1], 5, (0, 255, 0), -1)
 img = cv2.circle(img, src[2], 5, (0, 255, 0), -1)

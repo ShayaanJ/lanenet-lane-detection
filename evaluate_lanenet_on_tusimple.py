@@ -97,20 +97,20 @@ def eval_lanenet(src_dir, weights_path, save_dir, save_json):
         saver.restore(sess=sess, save_path=weights_path)
 
         image_list = glob.glob('{:s}/**/*.jpg'.format(src_dir), recursive=True)
-        clip_0530, clip_0531, clip_0601 = [], [], []
-        for i in image_list:
-            if i.split("clips")[1].split("/")[1] == "0530":
-                clip_0530.append(i)
-            elif i.split("clips")[1].split("/")[1] == "0531":
-                clip_0531.append(i)
-            elif i.split("clips")[1].split("/")[1] == "0601":
-                clip_0601.append(i)
+        # clip_0530, clip_0531, clip_0601 = [], [], []
+        # for i in image_list:
+        #     if i.split("clips")[1].split("/")[1] == "0530":
+        #         clip_0530.append(i)
+        #     elif i.split("clips")[1].split("/")[1] == "0531":
+        #         clip_0531.append(i)
+        #     elif i.split("clips")[1].split("/")[1] == "0601":
+        #         clip_0601.append(i)
         
-        image_list = []
-        for i in range(5):
-            image_list.append(clip_0530[rand.randint(0, len(clip_0530)-1)])
-            image_list.append(clip_0531[rand.randint(0, len(clip_0531)-1)])
-            image_list.append(clip_0601[rand.randint(0, len(clip_0601)-1)])
+        # image_list = []
+        # for i in range(5):
+        #     image_list.append(clip_0530[rand.randint(0, len(clip_0530)-1)])
+        #     image_list.append(clip_0531[rand.randint(0, len(clip_0531)-1)])
+        #     image_list.append(clip_0601[rand.randint(0, len(clip_0601)-1)])
         
         avg_time_cost = []
         dict = {}
