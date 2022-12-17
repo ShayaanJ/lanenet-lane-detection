@@ -96,21 +96,10 @@ def eval_lanenet(src_dir, weights_path, save_dir, save_json):
 
         saver.restore(sess=sess, save_path=weights_path)
 
-        image_list = glob.glob('{:s}/**/*.jpg'.format(src_dir), recursive=True)
-        # clip_0530, clip_0531, clip_0601 = [], [], []
-        # for i in image_list:
-        #     if i.split("clips")[1].split("/")[1] == "0530":
-        #         clip_0530.append(i)
-        #     elif i.split("clips")[1].split("/")[1] == "0531":
-        #         clip_0531.append(i)
-        #     elif i.split("clips")[1].split("/")[1] == "0601":
-        #         clip_0601.append(i)
-        
-        # image_list = []
-        # for i in range(5):
-        #     image_list.append(clip_0530[rand.randint(0, len(clip_0530)-1)])
-        #     image_list.append(clip_0531[rand.randint(0, len(clip_0531)-1)])
-        #     image_list.append(clip_0601[rand.randint(0, len(clip_0601)-1)])
+        # image_list = glob.glob('{:s}\**\*.jpg'.format(src_dir), recursive=True)
+
+        image_list = os.listdir(src_dir)
+        image_list = [src_dir + "/" + x for x in image_list]
         
         avg_time_cost = []
         dict = {}
@@ -174,11 +163,10 @@ def eval_lanenet(src_dir, weights_path, save_dir, save_json):
             cv2.imwrite(output_image_path.replace(".jpg", "") + 'binary_seg_image.jpg', binary_seg_image[0] * 255)
             cv2.imwrite(output_image_path.replace(".jpg", "") +  'instance_seg_image.jpg', embedding_image)
             cv2.imwrite(output_image_path.replace(".jpg", "") + 'mask_image.jpg', mask_image)
-            print("Images written")
         
-        with open(save_json, "w") as outfile:
-            json.dump(dict, outfile)
-        print("Json written")
+        # with open(save_json, "w") as outfile:
+            # json.dump(dict, outfile)
+        return dict
 
     return
 
@@ -189,6 +177,7 @@ if __name__ == '__main__':
     """
     # init args
     args = init_args()
+
 
     eval_lanenet(
         src_dir=args.image_dir,

@@ -5,3 +5,8 @@ log/
 
 # python cache
 *__pycache__*
+
+yolov7/
+traced_model.pt
+outputs/
+runs/
