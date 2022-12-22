@@ -36,7 +36,7 @@ def main(image_dir, weights="weights/tusimple_lanenet.ckpt"):
     # Task 4 and 5
     #--------------------------------
     print("Writing Video")
-    videoify(json.load(open(save_json)), vid_path)
+    videoify(lanes_json, vid_path)
     print(f"Video written in {vid_path}")
     
     return

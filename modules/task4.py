@@ -37,24 +37,28 @@ def src_pts(pts1, pts2, w):
 def homoify(pts, data_path="../test_set", const_image=(1312, 1312)):
     final_frames = []
     for frame in pts.keys():
-        img = cv2.imread(os.path.join(data_path, frame))
+        img_path = data_path +"/"+ frame
+        img = cv2.imread(img_path)
         lanes = pts[frame]
-        
         img_h, img_w, _ = img.shape
+        
+        # getting 2 lanes closest to center
         diff = list(map(lambda x: abs(x[-1][0] - img_w / 2), lanes))
         diff = np.argsort(diff)
         diff = diff[:2]
         diff.sort()
         lane1 = lanes[diff[0]]
         lane2 = lanes[diff[1]]
-
         src = np.array(src_pts(lane1, lane2, img_h), dtype=np.float32)
         dst = np.array(dst_pts(src), dtype=np.float32)
+
+        # homography matrix
         H = cv2.getPerspectiveTransform(src, dst)
         zeros = np.identity(3)
         zeros[:2, 2]  += [0, 750]
         H = zeros @ H
+
+        # warp image
         warp = cv2.warpPerspective(img, H, const_image)
         final_frames.append(warp)
-    
     return final_frames
