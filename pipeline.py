@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 
 from evaluate_lanenet_on_tusimple import eval_lanenet
-from modules.task5 import videoify
+from modules.video_util import videoify
 from ..yolov7.detect import detect
 
 DATA_PATH = "../test_set"
