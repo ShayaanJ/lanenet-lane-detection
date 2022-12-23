@@ -8,5 +8,4 @@ log/
 
 yolov7/
 traced_model.pt
-outputs/
 runs/

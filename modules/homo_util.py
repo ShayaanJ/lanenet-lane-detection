@@ -19,7 +19,6 @@ def dst_pts(src):
     dst4 = [int(src[1][0] - length*frac), src[2][1]]
     return [dst1, dst2, dst3, dst4]
 
-
 def src_pts(pts1, pts2, w):
     pts1 = [np.mean(pts1[:3], axis=0), np.mean(pts1[3:6], axis=0)]
     pts2 = [np.mean(pts2[:3], axis=0), np.mean(pts2[3:6], axis=0)]
@@ -36,6 +35,14 @@ def src_pts(pts1, pts2, w):
     src4 = [int(-(lane2[1]*y2 + lane2[2])/lane2[0]), y2]
     return [src1, src2, src3, src4]
 
+def bbox_mid_pts(txt_path):
+    bbox_txt = getAnnotations(txt_path)
+    bbox_txt = removeNoncar(bbox_txt)
+    bottom_mid_pt = [itsBboxTime(i) for i in bbox_txt]
+    bottom_mid_pt = np.array([np.array([i[0], i[1]]) for i in bottom_mid_pt], dtype=np.float32)
+    bottom_mid_pt = bottom_mid_pt.reshape(-1, 1, 2)
+    return bottom_mid_pt
+
 def homoify(pts, data_path="../test_set", yolo_path="outputs/yolo", const_image=(1312, 1312)):
     final_frames = []
     yolo_folder = sorted(os.listdir(yolo_path), key=lambda x: int(x.replace("exp", "0")))[-1]
@@ -43,15 +50,12 @@ def homoify(pts, data_path="../test_set", yolo_path="outputs/yolo", const_image=
         frame_num = frame.split("/")[-1].split(".")[0]
         txt_path = f"{yolo_path}/{yolo_folder}/labels/{frame_num}.txt"
         img_path = data_path +"/"+ frame
+        
+        #reading image, lanes, and bottom mid point of bboxes
         img = cv2.imread(img_path)
         lanes = pts[frame]
         img_h, img_w, _ = img.shape
-
-        bbox_txt = getAnnotations(txt_path)
-        bbox_txt = removeNoncar(bbox_txt)
-        bottom_mid_pt = [itsBboxTime(i) for i in bbox_txt]
-        bottom_mid_pt = np.array([np.array([i[0], i[1]]) for i in bottom_mid_pt], dtype=np.float32)
-        bottom_mid_pt = bottom_mid_pt.reshape(-1, 1, 2)
+        bottom_mid_pt = bbox_mid_pts(txt_path)
 
         # getting 2 lanes closest to center
         diff = list(map(lambda x: abs(x[-1][0] - img_w / 2), lanes))
