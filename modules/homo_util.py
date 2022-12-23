@@ -50,13 +50,27 @@ def homoify(pts, data_path="../test_set", yolo_path="outputs/yolo", save_path="o
         frame_num = frame.split("/")[-1].split(".")[0]
         temp = "/".join(frame.split("/")[1:-1])
         txt_path = f"{yolo_path}/{yolo_folder}/labels/{frame_num}.txt"
+        if not os.path.exists(txt_path):
+            print(f"txt file not found for {txt_path}")
+            continue
         img_path = f"{data_path}/{frame}"
-        seg_result = f"{save_path}{temp}/result/{frame_num}.jpg"
+        if not os.path.exists(img_path):
+            print(f"image not found for {img_path}")
+            continue
+        seg_result = f"{save_path}{temp}result/images/{frame_num}.jpeg"
+        if not os.path.exists(seg_result):
+            print(f"segmentation result not found for {seg_result}")
+            continue
+        
+
+        print(seg_result)
         
         #reading image, lanes, and bottom mid point of bboxes
         img = cv2.imread(img_path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         lanes = pts[frame]
+        if len(lanes) < 2:
+            continue
         img_h, img_w, _ = img.shape
         bottom_mid_pt = bbox_mid_pts(txt_path)
         seg_result_img = cv2.imread(seg_result)

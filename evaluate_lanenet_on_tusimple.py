@@ -152,17 +152,19 @@ def eval_lanenet(src_dir, weights_path, save_dir, save_json="test.json"):
                 LOG.info('Mean inference time every single image: {:.5f}s'.format(np.mean(avg_time_cost)))
                 avg_time_cost.clear()
 
-            input_image_dir = ops.split(image_path.split('clips')[1])[0][1:]
+            # input_image_dir = ops.split(image_path.split('clips')[1])[0][1:]
             input_image_name = ops.split(image_path)[1]
-            output_image_dir = ops.join(save_dir, input_image_dir)
+            output_image_dir = save_dir
+            # print(output_image_dir)
             os.makedirs(output_image_dir, exist_ok=True)
-            output_image_path = ops.join(output_image_dir, input_image_name)
-            if ops.exists(output_image_path):
-                continue
+            # output_image_path = ops.join(output_image_dir, input_image_name)
+            # if ops.exists(output_image_path):
+            #     continue
             
-            result_path = ops.join(output_image_dir, 'result')
+            result_path =output_image_dir + '/result'
+            # print(result_path)
             os.makedirs(result_path, exist_ok=True)
-            instance_seg_path = ops.join(output_image_dir, 'instance_seg')
+            instance_seg_path = output_image_dir + '/instance_seg'
             os.makedirs(instance_seg_path, exist_ok=True)
 
             cv2.imwrite(ops.join(result_path, input_image_name), postprocess_result['source_image'])
@@ -192,7 +194,7 @@ if __name__ == '__main__':
     #     save_json=args.save_json
     # )
     eval_lanenet(
-        src_dir="../test_set/clips/0530/1492626191132352208_0",
+        src_dir="../images",
         weights_path="weights/tusimple_lanenet.ckpt",
-        save_dir="outputs/seg_results/",
+        save_dir="outputs/seg_results/images",
     )
