@@ -63,7 +63,7 @@ def minmax_scale(input_arr):
 def sort_func(x):
     return x[1]
 
-def eval_lanenet(src_dir, weights_path, save_dir, save_json):
+def eval_lanenet(src_dir, weights_path, save_dir, save_json="test.json"):
     """
 
     :param src_dir:
@@ -159,10 +159,16 @@ def eval_lanenet(src_dir, weights_path, save_dir, save_json):
             output_image_path = ops.join(output_image_dir, input_image_name)
             if ops.exists(output_image_path):
                 continue
-            cv2.imwrite(output_image_path, postprocess_result['source_image'])
-            cv2.imwrite(output_image_path.replace(".jpg", "") + 'binary_seg_image.jpg', binary_seg_image[0] * 255)
-            cv2.imwrite(output_image_path.replace(".jpg", "") +  'instance_seg_image.jpg', embedding_image)
-            cv2.imwrite(output_image_path.replace(".jpg", "") + 'mask_image.jpg', mask_image)
+            
+            result_path = ops.join(output_image_dir, 'result')
+            os.makedirs(result_path, exist_ok=True)
+            instance_seg_path = ops.join(output_image_dir, 'instance_seg')
+            os.makedirs(instance_seg_path, exist_ok=True)
+
+            cv2.imwrite(ops.join(result_path, input_image_name), postprocess_result['source_image'])
+            # cv2.imwrite(output_image_path.replace(".jpg", "") + 'binary_seg_image.jpg', binary_seg_image[0] * 255)
+            cv2.imwrite(ops.join(instance_seg_path, input_image_name), embedding_image)
+            # cv2.imwrite(output_image_path.replace(".jpg", "") + 'mask_image.jpg', mask_image)
         
         # with open(save_json, "w") as outfile:
             # json.dump(dict, outfile)
@@ -179,9 +185,14 @@ if __name__ == '__main__':
     args = init_args()
 
 
+    # eval_lanenet(
+    #     src_dir=args.image_dir,
+    #     weights_path=args.weights_path,
+    #     save_dir=args.save_dir,
+    #     save_json=args.save_json
+    # )
     eval_lanenet(
-        src_dir=args.image_dir,
-        weights_path=args.weights_path,
-        save_dir=args.save_dir,
-        save_json=args.save_json
+        src_dir="../test_set/clips/0530/1492626191132352208_0",
+        weights_path="weights/tusimple_lanenet.ckpt",
+        save_dir="outputs/seg_results/",
     )

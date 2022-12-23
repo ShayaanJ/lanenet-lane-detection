@@ -49,7 +49,7 @@ def homoify(pts, data_path="../test_set", yolo_path="outputs/yolo", const_image=
     for frame in pts.keys():
         frame_num = frame.split("/")[-1].split(".")[0]
         txt_path = f"{yolo_path}/{yolo_folder}/labels/{frame_num}.txt"
-        img_path = data_path +"/"+ frame
+        img_path = f"{data_path}/{frame}"
         
         #reading image, lanes, and bottom mid point of bboxes
         img = cv2.imread(img_path)
@@ -78,6 +78,6 @@ def homoify(pts, data_path="../test_set", yolo_path="outputs/yolo", const_image=
         warped_pts = cv2.perspectiveTransform(bottom_mid_pt, H)
         warped_pts = np.array([i[0] for i in warped_pts], dtype=np.int32)
         warp = overlay(warp, warped_pts)
-
-        final_frames.append(warp)
+        
+        final_frames.append({"img":warp, "num_lanes":len(lanes), "num_objs":len(bottom_mid_pt)})
     return final_frames
