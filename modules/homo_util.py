@@ -43,19 +43,24 @@ def bbox_mid_pts(txt_path):
     bottom_mid_pt = bottom_mid_pt.reshape(-1, 1, 2)
     return bottom_mid_pt
 
-def homoify(pts, data_path="../test_set", yolo_path="outputs/yolo", const_image=(1312, 1312)):
+def homoify(pts, data_path="../test_set", yolo_path="outputs/yolo", save_path="outputs/seg_results", const_image=(1312, 1312)):
     final_frames = []
     yolo_folder = sorted(os.listdir(yolo_path), key=lambda x: int(x.replace("exp", "0")))[-1]
     for frame in pts.keys():
         frame_num = frame.split("/")[-1].split(".")[0]
+        temp = "/".join(frame.split("/")[1:-1])
         txt_path = f"{yolo_path}/{yolo_folder}/labels/{frame_num}.txt"
         img_path = f"{data_path}/{frame}"
+        seg_result = f"{save_path}{temp}/result/{frame_num}.jpg"
         
         #reading image, lanes, and bottom mid point of bboxes
         img = cv2.imread(img_path)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         lanes = pts[frame]
         img_h, img_w, _ = img.shape
         bottom_mid_pt = bbox_mid_pts(txt_path)
+        seg_result_img = cv2.imread(seg_result)
+        seg_result_img = cv2.cvtColor(seg_result_img, cv2.COLOR_BGR2RGB)
 
         # getting 2 lanes closest to center
         diff = list(map(lambda x: abs(x[-1][0] - img_w / 2), lanes))
@@ -80,5 +85,49 @@ def homoify(pts, data_path="../test_set", yolo_path="outputs/yolo", const_image=
         warped_pts = np.array([i[0] for i in warped_pts], dtype=np.int32)
         warp = overlay(warp, warped_pts)
         
-        final_frames.append({"img":warp, "num_lanes":len(lanes), "num_objs":len(bottom_mid_pt)})
+        line1 = line_eq(np.array([src[0], src[2]]))
+        line2 = line_eq(np.array([src[1], src[3]]))
+        line3 = line_eq(np.array([dst[0], dst[2]]))
+        line4 = line_eq(np.array([dst[1], dst[3]]))
+        
+        thresh = 0.01
+        w = thresh*1280
+        w2 = thresh*const_image[0]
+        left = 0
+        right = 0
+        changing = 0
+        for i in bottom_mid_pt:
+            ctr = 0
+            i = i[0]
+            i = i.astype(np.int32)
+            i2 = (H @ np.append(i, 1))
+            i2 = i2 / i2[2]
+            i2 = i2[:2]
+            i2 = i2.astype(np.int32)
+            lp1 = -(line1[2] + line1[1]*i[1]) / line1[0]
+            lp2 = -(line2[2] + line2[1]*i[1]) / line2[0]
+            lp3 = -(line3[2] + line3[1]*i2[1]) / line3[0]
+            lp4 = -(line4[2] + line4[1]*i2[1]) / line4[0]
+            left += 1 if i[0] <= lp1 else 0
+            right += 1 if i[0] >= lp2 else 0
+            # if (i[0] > lp1 - w and i[0] < lp1 + w):
+            #     ctr += 1
+            #     seg_result_img = cv2.circle(seg_result_img, i, 30, (255, 0, 0), -1)
+            # elif (i[0] > lp2 - w and i[0] < lp2 + w):
+            #     ctr += 1
+            #     seg_result_img = cv2.circle(seg_result_img, i, 30, (0, 255, 0), -1)
+
+            if (i2[0] > lp3 - w2 and i2[0] < lp3 + w2):
+                ctr += 1
+                warp = cv2.circle(warp, i2, 30, (255, 0, 0), -1)
+                seg_result_img = cv2.circle(seg_result_img, i, 30, (255, 0, 0), -1)
+            elif (i2[0] > lp4 - w2 and i2[0] < lp4 + w2):
+                ctr += 1
+                warp = cv2.circle(warp, i2, 30, (0, 255, 0), -1)
+                seg_result_img = cv2.circle(seg_result_img, i, 30, (0, 255, 0), -1)
+            changing += 0 if ctr == 0 else 1
+            # print("changing") if ctr >= 1 else None
+        final_frames.append({"img": warp, "num_lanes": len(
+            lanes), "num_objs": len(bottom_mid_pt), "left": left, "right": right, "changing": changing, "seg": seg_result_img})
+
     return final_frames
