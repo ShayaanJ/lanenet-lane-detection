@@ -30,7 +30,7 @@ def itsBboxTime(data):
     return int(ctrX), bottomY 
 
 # overlay bottom_mid_pt on image
-def overlay(img, pts):
+def overlay(img, pts, color=(212, 175, 55)):
     for i in pts:
-        img = cv2.circle(img, i, 7, (212, 175, 55), -1)
+        img = cv2.circle(img, i, 7, color, -1)
     return img

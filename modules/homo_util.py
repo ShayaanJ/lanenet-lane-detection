@@ -75,6 +75,7 @@ def homoify(pts, data_path="../test_set", yolo_path="outputs/yolo", const_image=
 
         # warp image
         warp = cv2.warpPerspective(img, H, const_image)
+
         warped_pts = cv2.perspectiveTransform(bottom_mid_pt, H)
         warped_pts = np.array([i[0] for i in warped_pts], dtype=np.int32)
         warp = overlay(warp, warped_pts)
